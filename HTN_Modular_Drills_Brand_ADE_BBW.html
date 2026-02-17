@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HTN Modular Drills (Brand↔Generic • Class ADEs • Drug Pearls/BBW)</title>
+<style>
+  :root{
+    --bg:#0b1220; --panel:#121c31; --panel2:#0f172a; --muted:#9fb0d0; --text:#e8eefc;
+    --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b; --brand:#60a5fa;
+    --chip:#1f2a44; --stroke:#223253;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; background:linear-gradient(180deg,var(--bg),#050a14); color:var(--text)}
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 18px 70px}
+  header{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
+  h1{font-size:20px;margin:0;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:13px;line-height:1.35;max-width:820px}
+  .row{display:grid;grid-template-columns:380px 1fr;gap:14px}
+  @media (max-width: 980px){.row{grid-template-columns:1fr}}
+  .card{background:rgba(18,28,49,.92);border:1px solid var(--stroke); border-radius:16px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card h2{font-size:14px;margin:0 0 10px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width: 560px){.grid2{grid-template-columns:1fr}}
+  .controls{display:flex;gap:10px;flex-wrap:wrap}
+  button{border:0;border-radius:12px;padding:10px 12px;font-weight:650;cursor:pointer;background:var(--brand);color:#061226}
+  button.secondary{background:#223253;color:var(--text);border:1px solid var(--stroke)}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--stroke)}
+  button.danger{background:var(--bad);color:#fff}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  select, input[type="number"]{
+    width:100%;background:var(--panel2);color:var(--text);
+    border:1px solid var(--stroke); border-radius:12px; padding:10px 12px; outline:none
+  }
+  label{display:block;color:var(--muted);font-size:12px;margin:6px 0 6px}
+  .chip{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--stroke);color:var(--muted);font-size:12px}
+  .chip b{color:var(--text)}
+  .qbox{padding:16px;border-radius:16px;background:rgba(15,23,42,.65);border:1px solid var(--stroke)}
+  .qmeta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .qmeta .left{display:flex;gap:8px;flex-wrap:wrap}
+  .tag{font-size:11px;padding:6px 9px;border-radius:999px;border:1px solid var(--stroke);background:#0d162a;color:var(--muted)}
+  .tag.ok{color:#b7f7c9;border-color:#1d7a3a;background:rgba(34,197,94,.12)}
+  .tag.bad{color:#ffd0d0;border-color:#7f1d1d;background:rgba(239,68,68,.12)}
+  .tag.warn{color:#ffe6b3;border-color:#925e09;background:rgba(245,158,11,.12)}
+  .qtext{font-size:18px;line-height:1.35;margin:4px 0 14px}
+  .options{display:grid;gap:10px}
+  .opt{padding:12px 12px;border-radius:14px;border:1px solid var(--stroke);background:#0e1930;cursor:pointer}
+  .opt:hover{background:#122142}
+  .opt.correct{border-color:#1d7a3a;background:rgba(34,197,94,.16)}
+  .opt.incorrect{border-color:#7f1d1d;background:rgba(239,68,68,.16)}
+  .explain{margin-top:12px;padding:12px;border-radius:14px;border:1px dashed #2b3e66;background:rgba(2,6,23,.35);color:#dbe7ff}
+  .explain .src{color:var(--muted);font-size:12px;margin-top:6px}
+  .bar{height:10px;background:#0b1428;border:1px solid var(--stroke);border-radius:999px;overflow:hidden}
+  .bar > div{height:100%;background:linear-gradient(90deg,#60a5fa,#22c55e);width:0%}
+  .small{font-size:12px;color:var(--muted);line-height:1.45}
+  code.k{background:rgba(2,6,23,.35);border:1px solid var(--stroke);padding:2px 6px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>HTN Modular Drills</h1>
+      <div class="sub">
+        Three separate study groups you can run independently:
+        <b>(1) Brand↔Generic</b>, <b>(2) Class→Common ADEs</b>, <b>(3) Drug→Pearls / “BBW-level” major risks</b>.
+        Missed questions repeat adaptively.
+      </div>
+      <div class="small" style="margin-top:8px">
+        Notes: “BBW-level” here means the major/flagged warning taught in your materials (e.g., ENaC blockers → hyperkalemia).
+        Source labels are shown per question as your course handouts (HTN table + pharmacology notes).
+      </div>
+    </div>
+    <div class="controls">
+      <button id="btnStart" onclick="start()">Start</button>
+      <button class="secondary" id="btnNext" onclick="nextQ()" disabled>Next</button>
+      <button class="ghost" id="btnPause" onclick="pauseToggle()" disabled>Pause</button>
+      <button class="danger" onclick="resetAll()">Reset</button>
+    </div>
+  </header>
+
+  <div class="row">
+    <div class="card">
+      <h2>Pick a group (run them separately)</h2>
+      <div class="grid2">
+        <div>
+          <label>Group</label>
+          <select id="group">
+            <option value="brand" selected>1) Brand ↔ Generic</option>
+            <option value="ade">2) Class → Common ADEs</option>
+            <option value="pearls">3) Drug → Pearls / Major risks (BBW-level)</option>
+          </select>
+        </div>
+        <div>
+          <label>Class filter</label>
+          <select id="section">
+            <option value="all" selected>All classes</option>
+            <option value="acei">ACE inhibitors</option>
+            <option value="arb">ARBs</option>
+            <option value="renin">Renin inhibitor</option>
+            <option value="dhp">DHP CCBs</option>
+            <option value="nondhp">Non-DHP CCBs</option>
+            <option value="thz">Thiazides</option>
+            <option value="loop">Loop diuretics</option>
+            <option value="enac">ENaC blockers (K-sparing)</option>
+            <option value="mra">MRA (spironolactone/eplerenone)</option>
+            <option value="beta">Beta blockers</option>
+            <option value="a1">Alpha-1 blockers</option>
+            <option value="a2">Alpha-2 agonists</option>
+            <option value="vaso">Direct vasodilators</option>
+          </select>
+        </div>
+        <div>
+          <label>Question count target</label>
+          <input id="target" type="number" min="30" max="900" value="260" />
+        </div>
+        <div>
+          <label>Adaptive repetition</label>
+          <select id="adaptive">
+            <option value="on" selected>On (missed repeat)</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:14px" class="chip"><b id="bank">0</b> questions loaded</div>
+      <div class="small" style="margin-top:10px">
+        GitHub Pages naming:
+        <ul style="margin:6px 0 0 18px">
+          <li>Make it your main page: rename to <code class="k">index.html</code></li>
+          <li>Keep alongside another page: e.g. <code class="k">modular.html</code> and open <code class="k">/modular.html</code></li>
+        </ul>
+      </div>
+      <div id="selftest" class="small" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <div class="qmeta">
+        <div class="left">
+          <span class="chip"><b id="progress">0/0</b> done</span>
+          <span class="chip"><b id="score">0</b> correct</span>
+          <span class="chip"><b id="streak">0</b> streak</span>
+        </div>
+        <div class="chip"><b id="modeNow">—</b></div>
+      </div>
+      <div class="bar"><div id="barFill"></div></div>
+
+      <div id="panel" class="qbox" style="margin-top:12px"></div>
+      <div id="missedBox" class="qbox" style="margin-top:12px;display:none"></div>
+      <div class="small" style="margin-top:10px">Missed items show below; adaptive mode will also re-insert them automatically.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SOURCES = {
+  table: "Antihypertensive Drug Table (course handout / Dr. Jamal HTN table)",
+  pharm: "PHAR 518 Antihypertensives & Sympatholytics Pharmacology",
+  htn: "PHAR 518 Hypertension (Student Version)"
+};
+
+// Drug lists (from your table-based set used in your earlier exam file)
+const DRUGS = {
+  acei: [
+    {gen:"Benazepril", brand:"Lotensin"},
+    {gen:"Captopril", brand:"Capoten"},
+    {gen:"Enalapril", brand:"Vasotec"},
+    {gen:"Fosinopril", brand:"Monopril"},
+    {gen:"Lisinopril", brand:"Prinivil, Zestril"},
+    {gen:"Moexipril", brand:"Univasc"},
+    {gen:"Perindopril", brand:"Aceon"},
+    {gen:"Quinapril", brand:"Accupril"},
+    {gen:"Ramipril", brand:"Altace"},
+    {gen:"Trandolapril", brand:"Mavik"}
+  ],
+  arb: [
+    {gen:"Azilsartan", brand:"Edarbi"},
+    {gen:"Candesartan", brand:"Atacand"},
+    {gen:"Eprosartan", brand:"Teveten"},
+    {gen:"Irbesartan", brand:"Avapro"},
+    {gen:"Losartan", brand:"Cozaar"},
+    {gen:"Telmisartan", brand:"Micardis"},
+    {gen:"Olmesartan", brand:"Benicar"},
+    {gen:"Valsartan", brand:"Diovan"}
+  ],
+  renin: [{gen:"Aliskiren", brand:"Tekturna"}],
+  dhp: [
+    {gen:"Amlodipine", brand:"Norvasc"},
+    {gen:"Felodipine", brand:"Plendil"},
+    {gen:"Nifedipine (long acting)", brand:"Adalat CC, Procardia XL"},
+    {gen:"Nisoldipine", brand:"Sular"},
+    {gen:"Nicardipine", brand:"Cardene IV"},
+    {gen:"Clevidipine", brand:"Cleviprex IV"}
+  ],
+  nondhp: [{gen:"Diltiazem", brand:"Cardizem"},{gen:"Verapamil", brand:"Calan"}],
+  thz: [
+    {gen:"Chlorothiazide", brand:"Diuril"},
+    {gen:"Chlorthalidone", brand:"Thalitone"},
+    {gen:"Hydrochlorothiazide", brand:"Microzide"},
+    {gen:"Indapamide", brand:"Lozol"},
+    {gen:"Metolazone", brand:"Zaroxolyn"}
+  ],
+  loop: [{gen:"Bumetanide", brand:"Bumex"},{gen:"Torsemide", brand:"Demadex"},{gen:"Furosemide", brand:"Lasix"},{gen:"Ethacrynic Acid", brand:"Edecrin"}],
+  enac: [
+    {gen:"Amiloride", brand:"Midamor"},
+    {gen:"Amiloride + hydrochlorothiazide", brand:"Moduretic"},
+    {gen:"Triamterene", brand:"Dyrenium"},
+    {gen:"Triamterene + hydrochlorothiazide", brand:"Dyazide, Maxide"}
+  ],
+  mra: [{gen:"Spironolactone", brand:"Aldactone"},{gen:"Eplerenone", brand:"Inspra"}],
+  beta: [
+    {gen:"Atenolol", brand:"Tenormin"},
+    {gen:"Betaxolol", brand:"Kerlone"},
+    {gen:"Bisoprolol", brand:"Zebeta"},
+    {gen:"Metoprolol tartrate", brand:"Lopressor"},
+    {gen:"Metoprolol succinate", brand:"Toprol XL"},
+    {gen:"Nebivolol", brand:"Bystolic"},
+    {gen:"Esmolol", brand:"Breviblock"},
+    {gen:"Nadolol", brand:"Corgard"},
+    {gen:"Propranolol", brand:"Inderal"},
+    {gen:"Timolol", brand:"Blocadren"},
+    {gen:"Carvedilol", brand:"Coreg"},
+    {gen:"Labetalol", brand:"Normodyne, Trandate"}
+  ],
+  a1: [{gen:"Doxazosin", brand:"Cardura"},{gen:"Prazosin", brand:"Minipress"},{gen:"Terazosin", brand:"Hytrin"}],
+  a2: [{gen:"Clonidine", brand:"Catapres"},{gen:"Guanfacine", brand:"Tenex"},{gen:"Methyldopa", brand:"Aldomet"}],
+  vaso: [{gen:"Hydralazine", brand:"Apresoline"},{gen:"Minoxidil", brand:"Loniten"}]
+};
+
+const CLASS_FACTS = {
+  acei: {class:"ACE inhibitors", commonADE:["Dry cough","Angioedema","Hyperkalemia","First-dose hypotension","Rash"], src:SOURCES.table},
+  arb: {class:"ARBs", commonADE:["Hyperkalemia","First-dose hypotension","Rash","Less angioedema vs ACEi (comparative note)"], src:SOURCES.table},
+  renin: {class:"Direct renin inhibitor", commonADE:["Hyperkalemia","First-dose hypotension","Rash"], src:SOURCES.table},
+  dhp: {class:"DHP CCBs", commonADE:["Hypotension (dizziness/flushing/headache)","Reflex tachycardia (esp IV)","Gingival hyperplasia","GI complaints","Mood changes"], src:SOURCES.table},
+  nondhp: {class:"Non-DHP CCBs", commonADE:["Bradycardia/AV block","Constipation (notably verapamil)","Negative inotropy (HF worsening risk)"], src:SOURCES.table},
+  thz: {class:"Thiazides", commonADE:["Hypokalemia","Hyponatremia","Hyperuricemia","Hyperglycemia","Hyperlipidemia","QT prolongation (via hypokalemia)"], src:SOURCES.table},
+  loop: {class:"Loop diuretics", commonADE:["Ototoxicity","Dehydration","Hypokalemia","Hypomagnesemia","Hypocalcemia"], src:SOURCES.table},
+  enac: {class:"ENaC blockers (K-sparing)", commonADE:["Hyperkalemia (BBW/major risk)","Electrolyte abnormalities"], src:SOURCES.table},
+  mra: {class:"MR antagonists", commonADE:["Hyperkalemia","Gynecomastia (spironolactone)"], src:SOURCES.table},
+  beta: {class:"Beta blockers", commonADE:["Bradycardia","Fatigue","Sexual dysfunction","Bronchoconstriction (nonselective)","Rebound tachy/HTN if abrupt stop"], src:SOURCES.table},
+  a1: {class:"Alpha-1 blockers", commonADE:["First-dose syncope","Orthostatic hypotension","Dizziness"], src:SOURCES.table},
+  a2: {class:"Alpha-2 agonists", commonADE:["Sedation","Dry mouth","Bradycardia","Depression","Rebound hypertension if abrupt stop"], src:SOURCES.table},
+  vaso:{class:"Direct vasodilators", commonADE:["Headache/flushing","Reflex tachycardia/angina","Salt/water retention"], src:SOURCES.table}
+};
+
+// Drug-level pearls / major risk flags (only items explicitly taught in the handout-style notes we embedded before)
+const DRUG_PEARLS = [
+  {drug:"Amiloride (Midamor)", clue:"BBW/major risk: hyperkalemia", src:SOURCES.table, tag:"BBW"},
+  {drug:"Triamterene (Dyrenium)", clue:"BBW/major risk: hyperkalemia", src:SOURCES.table, tag:"BBW"},
+  {drug:"Hydralazine (Apresoline)", clue:"Pearl/ADE: drug-induced lupus syndrome", src:SOURCES.table, tag:"pearl"},
+  {drug:"Minoxidil (Loniten)", clue:"Pearl/ADE: hypertrichosis (hair growth)", src:SOURCES.table, tag:"pearl"},
+  {drug:"Spironolactone (Aldactone)", clue:"Pearl/ADE: gynecomastia (anti-androgen effect)", src:SOURCES.table, tag:"pearl"},
+  {drug:"Nebivolol (Bystolic)", clue:"Pearl: stimulates eNOS → ↑ NO (vasodilation)", src:SOURCES.table, tag:"pearl"},
+  {drug:"Nifedipine (long acting)", clue:"Pearl: table note warns higher MI chance; avoid in cardiac history", src:SOURCES.table, tag:"pearl"},
+  {drug:"ACE inhibitors (class)", clue:"Major risk: fetopathy—stop when pregnancy confirmed", src:SOURCES.table, tag:"major"},
+  {drug:"ARBs (class)", clue:"Major risk: fetopathy—stop when pregnancy confirmed", src:SOURCES.table, tag:"major"},
+  {drug:"Aliskiren (Tekturna)", clue:"Major warning: do NOT combine with ACEi/ARB (course/table warning)", src:SOURCES.table, tag:"major"},
+  {drug:"Direct vasodilators (hydralazine/minoxidil)", clue:"Pearl: often need diuretic + beta blocker to blunt fluid retention + reflex tachy", src:SOURCES.table, tag:"pearl"}
+];
+
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+function randInt(n){ return Math.floor(Math.random()*n); }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=randInt(i+1); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function uniq(arr){ return [...new Set(arr)]; }
+function pick(arr){ return arr[randInt(arr.length)]; }
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+
+function flatAllDrugs(){
+  const out=[];
+  Object.values(DRUGS).forEach(list=>list.forEach(d=>out.push(d)));
+  return out;
+}
+const ALL = flatAllDrugs();
+
+function makeMCQ(q, correct, wrongs, explain, src, tags=[]){
+  const options = shuffle([correct, ...wrongs]).slice(0,4);
+  const answerIndex = options.indexOf(correct);
+  return {type:"mcq", q, options, answerIndex, explain, src, tags};
+}
+
+function distractorGenerics(correctGen){
+  const pool = ALL.filter(d=>d.gen!==correctGen);
+  return uniq(shuffle(pool).slice(0,3).map(d=>d.gen));
+}
+function distractorBrands(correctBrand){
+  const pool = ALL.filter(d=>d.brand!==correctBrand);
+  return uniq(shuffle(pool).slice(0,3).map(d=>d.brand));
+}
+
+function buildBank(group, section){
+  const qs=[];
+  const secs = (section==="all") ? Object.keys(DRUGS) : [section];
+
+  if(group==="brand"){
+    secs.forEach(sec=>{
+      (DRUGS[sec]||[]).forEach(d=>{
+        qs.push(makeMCQ(
+          `Brand → Generic: ${d.brand}`,
+          d.gen,
+          distractorGenerics(d.gen),
+          `${d.gen} is paired with ${d.brand} in your HTN table.`,
+          SOURCES.table,
+          ["brand→generic", sec]
+        ));
+        qs.push(makeMCQ(
+          `Generic → Brand: ${d.gen}`,
+          d.brand,
+          distractorBrands(d.brand),
+          `${d.gen} corresponds to brand ${d.brand} in your HTN table.`,
+          SOURCES.table,
+          ["generic→brand", sec]
+        ));
+      });
+    });
+  }
+
+  if(group==="ade"){
+    const keys = (section==="all") ? Object.keys(CLASS_FACTS) : [section];
+    const allADE = uniq(Object.values(CLASS_FACTS).flatMap(x=>x.commonADE));
+    keys.forEach(k=>{
+      const F = CLASS_FACTS[k];
+      if(!F) return;
+      const correctADE = pick(F.commonADE);
+      const wrongs = shuffle(allADE.filter(a=>a!==correctADE)).slice(0,3);
+      qs.push(makeMCQ(
+        `Class → Common ADE: Which is associated with ${F.class}?`,
+        correctADE,
+        wrongs,
+        `A commonly tested ADE for ${F.class} includes: ${correctADE}.`,
+        F.src,
+        ["class→ADE", k]
+      ));
+      // reverse
+      const allClasses = uniq(Object.values(CLASS_FACTS).map(x=>x.class));
+      const wrongC = shuffle(allClasses.filter(c=>c!==F.class)).slice(0,3);
+      qs.push(makeMCQ(
+        `Reverse (ADE → Class): Which class best matches "${correctADE}"?`,
+        F.class,
+        wrongC,
+        `That ADE is classically associated with ${F.class} in your materials.`,
+        F.src,
+        ["ADE→class", k]
+      ));
+    });
+  }
+
+  if(group==="pearls"){
+    // filter pearls by section if possible
+    const items = (section==="all")
+      ? DRUG_PEARLS
+      : DRUG_PEARLS.filter(p=>{
+          const s = section.toLowerCase();
+          const d = p.drug.toLowerCase();
+          if(section==="acei") return d.includes("ace");
+          if(section==="arb") return d.includes("arb");
+          if(section==="renin") return d.includes("aliskiren");
+          if(section==="dhp") return d.includes("nifedipine");
+          if(section==="nondhp") return false;
+          if(section==="thz") return false;
+          if(section==="loop") return false;
+          if(section==="enac") return d.includes("amiloride") || d.includes("triamterene");
+          if(section==="mra") return d.includes("spironolactone");
+          if(section==="beta") return d.includes("nebivolol");
+          if(section==="a1") return false;
+          if(section==="a2") return false;
+          if(section==="vaso") return d.includes("hydralazine") || d.includes("minoxidil") || d.includes("vasodilators");
+          return false;
+        });
+
+    const poolClues = uniq(DRUG_PEARLS.map(x=>x.clue));
+    const poolDrugs = uniq(DRUG_PEARLS.map(x=>x.drug));
+
+    items.forEach(it=>{
+      const wrongClues = shuffle(poolClues.filter(c=>c!==it.clue)).slice(0,3);
+      qs.push(makeMCQ(
+        `Drug → Pearl/Major risk: ${it.drug}`,
+        it.clue,
+        wrongClues,
+        `Pearl/major risk taught in your materials for ${it.drug}: ${it.clue}.`,
+        it.src,
+        ["drug→pearl", it.tag]
+      ));
+
+      const wrongDrugs = shuffle(poolDrugs.filter(d=>d!==it.drug)).slice(0,3);
+      qs.push(makeMCQ(
+        `Reverse (Clue → Drug): Which best matches "${it.clue}"?`,
+        it.drug,
+        wrongDrugs,
+        `That clue is specifically tied to ${it.drug} in your HTN/pharm notes.`,
+        it.src,
+        ["pearl→drug", it.tag]
+      ));
+    });
+  }
+
+  return shuffle(qs);
+}
+
+// ENGINE (adaptive repetition)
+let BANK=[], QUEUE=[], MISSED=[];
+let done=0, correct=0, streak=0, paused=false, current=null, answered=false;
+
+function modeLabel(g){
+  return {brand:"Brand↔Generic", ade:"Class→ADE", pearls:"Drug→Pearls/Major risks"}[g] || "—";
+}
+
+function start(){
+  const group = document.getElementById('group').value;
+  const section = document.getElementById('section').value;
+  const target = clamp(parseInt(document.getElementById('target').value,10)||260, 30, 900);
+
+  BANK = buildBank(group, section);
+
+  let picked = [...BANK];
+  if(picked.length === 0){
+    document.getElementById('panel').innerHTML =
+      "<div class='small'>No questions available for that filter (try a different class filter or choose All).</div>";
+    return;
+  }
+  while(picked.length < target){
+    picked.push(...shuffle([...BANK]).slice(0, Math.min(BANK.length, target-picked.length)));
+  }
+  if(picked.length > target) picked = picked.slice(0, target);
+
+  QUEUE = picked.map((q,i)=>({q,id:i,weight:1,seen:0,wrong:0}));
+  shuffle(QUEUE);
+
+  MISSED=[]; done=0; correct=0; streak=0; paused=false; current=null; answered=false;
+
+  document.getElementById('bank').innerText = String(picked.length);
+  document.getElementById('modeNow').innerText = modeLabel(group);
+  document.getElementById('btnNext').disabled = true;
+  document.getElementById('btnPause').disabled = false;
+  document.getElementById('btnPause').innerText = 'Pause';
+  document.getElementById('missedBox').style.display = 'none';
+
+  nextQ(true);
+  hud();
+}
+
+function pauseToggle(){
+  paused = !paused;
+  document.getElementById('btnPause').innerText = paused ? 'Resume' : 'Pause';
+}
+
+function resetAll(){
+  BANK=[]; QUEUE=[]; MISSED=[];
+  done=0; correct=0; streak=0; paused=false; current=null; answered=false;
+  document.getElementById('panel').innerHTML = "<div class='small'>Pick a group + class filter, then click <b>Start</b>.</div>";
+  document.getElementById('bank').innerText = "0";
+  document.getElementById('btnNext').disabled = true;
+  document.getElementById('btnPause').disabled = true;
+  document.getElementById('modeNow').innerText = "—";
+  document.getElementById('barFill').style.width = "0%";
+  document.getElementById('missedBox').style.display = 'none';
+  hud();
+}
+
+function pullNext(){
+  const adaptive = document.getElementById('adaptive').value === 'on';
+  if(!QUEUE.length) return null;
+  if(!adaptive) return QUEUE.shift();
+
+  let total=0; for(const it of QUEUE) total += it.weight;
+  let r = Math.random()*total;
+  for(let i=0;i<QUEUE.length;i++){
+    r -= QUEUE[i].weight;
+    if(r<=0) return QUEUE.splice(i,1)[0];
+  }
+  return QUEUE.shift();
+}
+
+function nextQ(force=false){
+  if(paused && !force) return;
+  answered=false;
+  document.getElementById('btnNext').disabled = true;
+
+  const it = pullNext();
+  if(!it){
+    document.getElementById('panel').innerHTML = `<h3 style="margin:0 0 10px">Finished</h3>
+      <div class="small">No more questions. Hit <b>Reset</b> → adjust group/filter → <b>Start</b>.</div>`;
+    showMissed();
+    hud();
+    return;
+  }
+  current = it;
+  current.seen += 1;
+  render(it);
+  hud();
+}
+
+function hud(){
+  const total = done + QUEUE.length + (current && !answered ? 1 : 0);
+  document.getElementById('progress').innerText = `${done}/${Math.max(total,0)}`;
+  document.getElementById('score').innerText = `${correct}`;
+  document.getElementById('streak').innerText = `${streak}`;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('barFill').style.width = pct + "%";
+}
+
+function render(it){
+  const q = it.q;
+  const panel = document.getElementById('panel');
+
+  const meta = `<div class="qmeta">
+    <div class="left">
+      ${(q.tags||[]).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}
+    </div>
+    <div>
+      <span class="tag warn">Seen: ${it.seen}</span>
+      ${it.wrong?`<span class="tag bad">Missed: ${it.wrong}</span>`:''}
+    </div>
+  </div>`;
+
+  const opts = (q.options||[]).map((opt, idx)=>`<div class="opt" onclick="submit(${idx})">${escapeHtml(opt)}</div>`).join('');
+
+  panel.innerHTML = `${meta}
+    <div class="qtext">${escapeHtml(q.q)}</div>
+    <div class="options">${opts}</div>
+    <div id="fb"></div>`;
+}
+
+function submit(choice){
+  if(!current || answered) return;
+  const q = current.q;
+  const opts = Array.from(document.querySelectorAll('.opt'));
+
+  const correctIdx = q.answerIndex;
+  const ok = choice === correctIdx;
+
+  answered=true;
+  done++;
+
+  if(ok){
+    correct++; streak++;
+    opts[choice]?.classList.add('correct');
+    current.weight = Math.max(1, current.weight - 0.25);
+  }else{
+    streak=0;
+    current.wrong += 1;
+    opts[choice]?.classList.add('incorrect');
+    opts[correctIdx]?.classList.add('correct');
+
+    MISSED.push({q:q.q, tags:q.tags||[], src:q.src});
+    const adaptive = document.getElementById('adaptive').value === 'on';
+    if(adaptive){
+      current.weight = Math.min(6, current.weight + 1.25);
+      const insertAt = Math.min(QUEUE.length, 6 + randInt(12));
+      QUEUE.splice(insertAt, 0, current);
+    }
+  }
+
+  document.getElementById('fb').innerHTML =
+    `<div class="explain">${escapeHtml(q.explain)}<div class="src">Source: ${escapeHtml(q.src)}</div></div>`;
+
+  document.getElementById('btnNext').disabled = false;
+  hud();
+  showMissed();
+}
+
+function showMissed(){
+  const box = document.getElementById('missedBox');
+  if(!MISSED.length){
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = 'block';
+  const last = MISSED.slice(-10).reverse();
+  box.innerHTML = `<div class="small"><b>Recent missed</b> (last ${last.length})</div>` +
+    last.map(m=>`<div class="explain" style="margin-top:10px">
+      <div style="font-weight:800;margin-bottom:6px">${escapeHtml(m.q).slice(0,220)}${m.q.length>220?'…':''}</div>
+      <div class="src">Tags: ${(m.tags||[]).map(escapeHtml).join(', ')} • Source: ${escapeHtml(m.src)}</div>
+    </div>`).join('');
+}
+
+function assert(cond,msg){ if(!cond) throw new Error(msg); }
+function runSelfTests(){
+  const b1 = buildBank("brand","all");  assert(b1.length > 80, "Brand↔Generic bank too small");
+  const b2 = buildBank("ade","all");    assert(b2.length > 10, "ADE bank too small");
+  const b3 = buildBank("pearls","all"); assert(b3.length > 10, "Pearls/major bank too small");
+  // sanity on answerIndex
+  for(const q of [...b1,...b2,...b3]){
+    assert(Number.isInteger(q.answerIndex), "Missing answerIndex");
+    assert(q.answerIndex>=0 && q.answerIndex<q.options.length, "answerIndex out of range");
+  }
+  return `Self-tests passed. Banks: brand ${b1.length}, ADE ${b2.length}, pearls ${b3.length}.`;
+}
+function showSelfTest(){
+  const el = document.getElementById('selftest');
+  try{
+    const msg = runSelfTests();
+    el.innerHTML = `<span class="tag ok">OK</span> ${escapeHtml(msg)}`;
+    console.log("[SELFTEST]", msg);
+  }catch(e){
+    el.innerHTML = `<span class="tag bad">FAIL</span> ${escapeHtml(e.message)}`;
+    console.error("[SELFTEST FAIL]", e);
+  }
+}
+
+resetAll();
+showSelfTest();
+</script>
+</body>
+</html>
